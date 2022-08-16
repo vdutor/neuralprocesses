@@ -262,7 +262,7 @@ def main(**kw_args):
         args,
         config,
         num_tasks_train=2**6 if args.train_fast else 2**14,
-        num_tasks_cv=2**6 if args.train_fast else 2**12,
+        num_tasks_cv=2**6 if args.evaluate_fast else 2**12,
         num_tasks_eval=2**6 if args.evaluate_fast else 2**12,
         device=device,
     )
@@ -604,9 +604,9 @@ def main(**kw_args):
                             gen,
                         )
 
-        # Sleep for sixty seconds before exiting.
+        # Sleep for 4 seconds before exiting.
         out.out("Finished evaluation. Sleeping for a minute before exiting.")
-        time.sleep(60)
+        time.sleep(4)
     else:
         # Perform training. First, check if we want to resume training.
         start = 0

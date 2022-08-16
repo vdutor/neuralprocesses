@@ -67,7 +67,7 @@ def construct_predefined_gens(
         name: GPGenerator(
             dtype,
             seed=seed,
-            noise=0.05,
+            noise=1e-6,
             kernel=kernel,
             num_context=UniformDiscrete(0, 30 * dim_x),
             num_target=UniformDiscrete(50 * dim_x, 50 * dim_x),
@@ -94,7 +94,7 @@ def construct_predefined_gens(
             GPGenerator(
                 dtype,
                 seed=seed + i,
-                noise=0.05,
+                noise=1e-6,
                 kernel=kernel,
                 num_context=UniformDiscrete(0, 75 * dim_x),
                 num_target=UniformDiscrete(100 * dim_x, 100 * dim_x),
