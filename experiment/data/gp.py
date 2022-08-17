@@ -26,6 +26,11 @@ def setup(name, args, config, *, num_tasks_train, num_tasks_cv, num_tasks_eval, 
         # Since the PPU is reduced, we can also take off a layer of the UNet.
         config["unet_strides"] = config["unet_strides"][:-1]
         config["unet_channels"] = config["unet_channels"][:-1]
+    elif args.dim_x == 3:
+        config["points_per_unit"] = 4
+        # Since the PPU is reduced, we can also take off a layer of the UNet.
+        config["unet_strides"] = config["unet_strides"][:-1]
+        config["unet_channels"] = config["unet_channels"][:-1]
     else:
         raise RuntimeError(f"Invalid input dimensionality {args.dim_x}.")
 

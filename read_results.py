@@ -51,7 +51,7 @@ def parse_logs():
 def build_entries(results, rows):
     entries = []
     for data in ["eq", "matern", "weakly-periodic", "sawtooth", "mixture"]:
-        for dim_x in [1, 2]:
+        for dim_x in [1, 2, 3]:
             for dim_y in [1]:
                 for row in rows:
                     # Build the entry for kind `loglik`.
@@ -109,39 +109,8 @@ def format_number(value, error, *, bold=False, possibly_negative=True):
         bold_start, bold_end = "\\mathbf{", "}"
     else:
         bold_start, bold_end = "", ""
-    return f"${sign_spacer}{bold_start}{value:.2f}{bold_end} {{ \\pm \\small {error:.2f} }}$"
+    return f"${sign_spacer}{bold_start}{value:.2f}{bold_end} {{ \\pm \\scriptstyle {error:.2f} }}$"
 
-
-def format_table(title1, title2, df, cols, *, possibly_negative, ascending=True):
-    for col in cols:
-        col["best"] = n_best(df, col["value"], col["error"], ascending=ascending)
-
-    res = f"\\begin{{tabular}}[t]{{l{'c' * len(cols)}}} \n"
-    res += "\\toprule \n"
-    res += title1
-    for col in cols:
-        if title2:
-            res += " & \\multirow{2}{*}{" + col["name"] + "}"
-        else:
-            res += " & " + col["name"]
-    if title2:
-        res += " \\\\ \n"
-        res += title2 + " \\\\ \\midrule \n"
-    else:
-        res += " \\\\ \\midrule \n"
-    for name, row in df.iterrows():
-        res += name
-        for col in cols:
-            res += " & " + format_number(
-                row[col["value"]],
-                row[col["error"]],
-                bold=name in col["best"],
-                possibly_negative=possibly_negative,
-            )
-        res += " \\\\ \n"
-    res += "\\bottomrule \\\\ \n"
-    res += "\\end{tabular}"
-    return res
 
 
 results = parse_logs()
@@ -157,81 +126,76 @@ df = pd.DataFrame(entries)
 df = df[df.data.isin(["eq", "matern", "weakly-periodic"])]
 del df["kind"]
 del df["dim_y"]
+
+DATAFRAME_NDP = [
+    {"name": "NDP", "data": "eq", "dim_x": 1, "int": 0.38, "int-err": 0.05},
+    {"name": "trivial", "data": "eq", "dim_x": 1, "int": -1.41, "int-err": 0.03},
+    {"name": "NDP", "data": "eq", "dim_x": 2, "int": -1.01, "int-err": 0.03},
+    {"name": "trivial", "data": "eq", "dim_x": 2, "int": -1.42, "int-err": 0.02},
+    {"name": "NDP", "data": "matern", "dim_x": 1, "int": -0.13, "int-err": 0.05},
+    {"name": "trivial", "data": "matern", "dim_x": 1, "int": -0.43, "int-err": 0.02},
+    {"name": "NDP", "data": "matern", "dim_x": 2, "int": -1.15, "int-err": 0.02},
+    {"name": "trivial", "data": "matern", "dim_x": 2, "int": -1.43, "int-err": 0.02},
+]
+df = pd.concat([df, pd.DataFrame(DATAFRAME_NDP)])
+
 df = df.set_index(["data", "dim_x", "name"])
 df = pd.pivot_table(df, index=['name'], columns=['data', 'dim_x'], fill_value=np.nan)
 
-print(df)
+df["int"] = -df["int"]
+possible_negative = True
+ascending = True
+show_rank = False
 
-DATASETS = ["eq", "weakly-periodic", "matern"]
-XDIMS = [1, 2]
-COLS = list(it.product(DATASETS, XDIMS))
+rank = df.rank().mean(axis=1)
+df = df.iloc[np.argsort(rank.values)]
+
+DATASETS = ["eq", "matern"]
+DATASET_NAME = {
+    "eq": "Squared Exponential",
+    "matern": r"Mat\'ern",
+}
+# DATASETS = ["eq", "matern"]
+XDIMS = [1, 2, 3]
+COLS = [
+    {"dataset": dataset, "xdim": xdim}
+    for dataset, xdim in list(it.product(DATASETS, XDIMS))
+]
 
 
-table = f"\\begin{{tabular}}{{l{'c' * len(COLS)}}} \n"
+table = f"\\begin{{tabular}}{{l{'c' * len(COLS)}{'c' if show_rank else ''}}} \n"
 table += "\\toprule \n"
 
-header1 = '& '.join([f"\\multicolumn{{{len(XDIMS)}}}{{c}}{{{d}}}" for d in DATASETS])
+header1 = '& '.join([f"\\multicolumn{{{len(XDIMS)}}}{{c}}{{{DATASET_NAME[d]}}}" for d in DATASETS])
+if show_rank:
+    header1 += r'& \multirow{2}{*}{av. rank}'
 table += '&' + header1 + '\\\\ \n'
 
-header2 = '& '.join([f"Dx = {xdim}" for _ in DATASETS for xdim in XDIMS])
+
+header2 = '& '.join([f"$D_x = {xdim}$" for _ in DATASETS for xdim in XDIMS])
 table += '&' + header2 + ' \\\\ \n'
 
 table += " \\midrule \n"
 
+for col in COLS:
+    col["best"] = n_best(
+        df.xs(col["dataset"], level="data", axis=1).xs(col["xdim"], level="dim_x", axis=1),
+        "int",
+        "int-err",
+        ascending=ascending
+    )
 
 for name, data in df.iterrows():
     table += name
-    for dataset, xdim in it.product(DATASETS, XDIMS):
+    for col in COLS:
+        dataset, xdim, best = col["dataset"], col["xdim"], col["best"]
         val = data.xs(dataset, level="data").xs(xdim, level="dim_x")["int"]
         err = data.xs(dataset, level="data").xs(xdim, level="dim_x")["int-err"]
-        table += " & " + format_number(val, err, bold=False, possibly_negative=True)
+        table += " & " + format_number(val, err, bold=name in best, possibly_negative=possible_negative)
+    if show_rank:
+        table += f' & {rank[name]:.2f}'
     table += " \\\\ \n"
 
 table += "\\bottomrule \n"
 table += "\\end{tabular}"
 print(table)
-
-# columns = [
-#     {"name": "Interp.", "value": "int", "error": "int-err"},
-# ]
-
-# ascending = False
-# possible_negative = True
-
-# datasets = [
-#     {"name": "EQ", "key": "eq"},
-#     {"name": "WeaklyPeriodic", "key": "weakly-periodic"},
-# ]
-# xdims = [1, 2]
-
-
-# res = ""
-
-# for row in rows:
-#     res += row["name"]
-#     for dataset in datasets:
-#         for xdim in xdims:
-#             df_ = (df
-#                 .xs(row["name"], level="name")
-#                 .xs(dataset["key"], level="data")
-#                 .xs("loglik", level="kind")
-#                 .xs(xdim, level="dim_x")
-#                 .xs(1, level="dim_y")
-#                 .sort_values("int", ascending=ascending)
-#             )
-
-
-
-
-
-# title1 = "EQ"
-# title2 = "Dx = 1"
-# table = format_table(
-#     title1,
-#     title2,
-#     df.xs("eq", level="data").xs("loglik", level="kind").xs(1, level="dim_x").xs(1, level="dim_y").sort_values("int", ascending=ascending),
-#     columns,
-#     possibly_negative=True,
-#     ascending=ascending,
-# )
-# print(table)
