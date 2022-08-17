@@ -132,10 +132,14 @@ DATAFRAME_NDP = [
     {"name": "trivial", "data": "eq", "dim_x": 1, "int": -1.41, "int-err": 0.03},
     {"name": "NDP", "data": "eq", "dim_x": 2, "int": -1.01, "int-err": 0.03},
     {"name": "trivial", "data": "eq", "dim_x": 2, "int": -1.42, "int-err": 0.02},
+    {"name": "NDP", "data": "eq", "dim_x": 3, "int": -1.20, "int-err": 0.01},
+    {"name": "trivial", "data": "eq", "dim_x": 3, "int": -1.45, "int-err": 0.02},
     {"name": "NDP", "data": "matern", "dim_x": 1, "int": -0.13, "int-err": 0.05},
-    {"name": "trivial", "data": "matern", "dim_x": 1, "int": -0.43, "int-err": 0.02},
+    {"name": "trivial", "data": "matern", "dim_x": 1, "int": -1.43, "int-err": 0.02},
     {"name": "NDP", "data": "matern", "dim_x": 2, "int": -1.15, "int-err": 0.02},
     {"name": "trivial", "data": "matern", "dim_x": 2, "int": -1.43, "int-err": 0.02},
+    {"name": "NDP", "data": "matern", "dim_x": 3, "int": -1.15, "int-err": 0.01},
+    {"name": "trivial", "data": "matern", "dim_x": 3, "int": -1.45, "int-err": 0.02},
 ]
 df = pd.concat([df, pd.DataFrame(DATAFRAME_NDP)])
 

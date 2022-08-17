@@ -40,7 +40,7 @@ def visualise_1d(model, gen, *, path, config, predict):
 
     # Define points to predict at.
     with B.on_device(batch["xt"]):
-        x = B.linspace(B.dtype(batch["xt"]), *plot_config["range"], 200)
+        x = B.linspace(B.dtype(batch["xt"]), -2, 2, 200)
 
     # Predict with model.
     with torch.no_grad():
@@ -52,27 +52,11 @@ def visualise_1d(model, gen, *, path, config, predict):
             ),
         )
 
-    plt.figure(figsize=(8, 6 * config["dim_y"]))
+    plt.figure(figsize=(8, 3 * config["dim_y"]))
 
     for i in range(config["dim_y"]):
         plt.subplot(config["dim_y"], 1, 1 + i)
 
-        # Plot context and target.
-        plt.scatter(
-            nps.batch_xc(batch, i)[0, 0],
-            nps.batch_yc(batch, i)[0],
-            label="Context",
-            style="train",
-            s=20,
-        )
-
-        plt.scatter(
-            nps.batch_xt(batch, i)[0, 0],
-            nps.batch_yt(batch, i)[0],
-            label="Target",
-            style="test",
-            s=20,
-        )
 
         # Plot prediction.
         err = 1.96 * B.sqrt(var[i][0, 0])
@@ -80,19 +64,22 @@ def visualise_1d(model, gen, *, path, config, predict):
             x,
             mean[i][0, 0],
             label="Prediction",
-            style="pred",
+            color="C0",
+            # style="pred",
         )
         plt.fill_between(
             x,
             mean[i][0, 0] - err,
             mean[i][0, 0] + err,
-            style="pred",
+            color="C0",
+            alpha=.2,
         )
         plt.plot(
             x,
             B.transpose(samples[i][:10, 0, 0]),
-            style="pred",
-            ls="-",
+            # style="pred",
+            color="C0",
+            ls="--",
             lw=0.5,
         )
 
@@ -107,15 +94,38 @@ def visualise_1d(model, gen, *, path, config, predict):
             # Compute posterior GP.
             f_post = f | (f(xc, noise), yc)
             mean, lower, upper = f_post(x).marginal_credible_bounds()
-            plt.plot(x, mean, label="Truth", style="pred2")
-            plt.plot(x, lower, style="pred2")
-            plt.plot(x, upper, style="pred2")
+            plt.plot(x, mean, label="Truth", color="C1")
+            plt.plot(x, lower, color="C1")
+            plt.plot(x, upper, color="C1")
 
         for x_axvline in plot_config["axvline"]:
             plt.axvline(x_axvline, c="k", ls="--", lw=0.5)
 
+        # Plot context and target.
+        plt.scatter(
+            nps.batch_xc(batch, i)[0, 0],
+            nps.batch_yc(batch, i)[0],
+            color="k",
+            label="Context",
+            # style="train",
+            s=20,
+            zorder=5,
+        )
+
+        plt.scatter(
+            nps.batch_xt(batch, i)[0, 0],
+            nps.batch_yt(batch, i)[0],
+            color="C3",
+            marker="x",
+            label="Target",
+            # style="test",
+            s=20,
+            zorder=5,
+        )
+        plt.ylabel(config["ylabel"].upper())
+
         plt.xlim(B.min(x), B.max(x))
-        tweak()
+        tweak(legend=False)
 
     plt.savefig(path)
     plt.close()
