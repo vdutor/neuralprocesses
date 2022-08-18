@@ -122,10 +122,24 @@ def visualise_1d(model, gen, *, path, config, predict):
             s=20,
             zorder=5,
         )
-        plt.ylabel(config["ylabel"].upper())
 
+        # import numpy as np
+        # print(nps.batch_xt(batch, i)[0, 0].numpy().shape)
+        # print(nps.batch_yt(batch, i)[0].numpy().shape)
+        # print(nps.batch_xc(batch, i)[0, 0].numpy().shape)
+        # print(nps.batch_yc(batch, i)[0].numpy().shape)
+        # np.savez(
+        #     "data_plot_eq_nps.npz",
+        #     xt=nps.batch_xt(batch, i)[0, 0].numpy(),
+        #     yt=nps.batch_yt(batch, i)[0].numpy(),
+        #     xc=nps.batch_xc(batch, i)[0, 0].numpy(),
+        #     yc=nps.batch_yc(batch, i)[0].numpy(),
+        #     gp_mean=mean.numpy(),
+        #     gp_lower=lower.numpy(),
+        #     gp_upper=upper.numpy(),
+        # )
         plt.xlim(B.min(x), B.max(x))
-        tweak(legend=False)
+        tweak()
 
     plt.savefig(path)
     plt.close()

@@ -50,7 +50,7 @@ def parse_logs():
 # Build data frame.
 def build_entries(results, rows):
     entries = []
-    for data in ["eq", "matern", "weakly-periodic", "sawtooth", "mixture"]:
+    for data in ["eq", "matern"]:
         for dim_x in [1, 2, 3]:
             for dim_y in [1]:
                 for row in rows:
@@ -138,7 +138,7 @@ DATAFRAME_NDP = [
     {"name": "trivial", "data": "matern", "dim_x": 1, "int": -1.43, "int-err": 0.02},
     {"name": "NDP", "data": "matern", "dim_x": 2, "int": -1.15, "int-err": 0.02},
     {"name": "trivial", "data": "matern", "dim_x": 2, "int": -1.43, "int-err": 0.02},
-    {"name": "NDP", "data": "matern", "dim_x": 3, "int": -1.15, "int-err": 0.01},
+    {"name": "NDP", "data": "matern", "dim_x": 3, "int": -1.19, "int-err": 0.01},
     {"name": "trivial", "data": "matern", "dim_x": 3, "int": -1.45, "int-err": 0.02},
 ]
 df = pd.concat([df, pd.DataFrame(DATAFRAME_NDP)])
@@ -151,7 +151,7 @@ possible_negative = True
 ascending = True
 show_rank = False
 
-rank = df.rank().mean(axis=1)
+rank = df["int"].rank().mean(axis=1)
 df = df.iloc[np.argsort(rank.values)]
 
 DATASETS = ["eq", "matern"]
