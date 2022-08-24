@@ -32,7 +32,10 @@ def setup(name, args, config, *, num_tasks_train, num_tasks_cv, num_tasks_eval, 
         config["unet_strides"] = config["unet_strides"][:-1]
         config["unet_channels"] = config["unet_channels"][:-1]
     else:
-        raise RuntimeError(f"Invalid input dimensionality {args.dim_x}.")
+        config["points_per_unit"] = 1
+        # Since the PPU is reduced, we can also take off a layer of the UNet.
+        config["unet_strides"] = config["unet_strides"][:-1]
+        config["unet_channels"] = config["unet_channels"][:-1]
 
     # Other settings specific to the GP experiments:
     config["plot"] = {
@@ -84,9 +87,9 @@ def setup(name, args, config, *, num_tasks_train, num_tasks_cv, num_tasks_eval, 
                 )[args.data],
             )
             for eval_name, x_range_context, x_range_target in [
-                ("interpolation in training range", (-2, 2), (-2, 2)),
-                ("interpolation beyond training range", (2, 6), (2, 6)),
-                ("extrapolation beyond training range", (-2, 2), (2, 6)),
+                ("interpolation in training range", (-1, 1), (-1, 1)),
+                # ("interpolation beyond training range", (2, 6), (2, 6)),
+                # ("extrapolation beyond training range", (-2, 2), (2, 6)),
             ]
         ]
 
