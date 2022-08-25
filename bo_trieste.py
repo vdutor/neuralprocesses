@@ -430,16 +430,6 @@ def get_model(**kw_args):
     model.load_state_dict(torch.load(wd.file(name), map_location=device)["weights"])
     return model, args.model, args.dim_x
 
-    # Make some plots.
-    # gen = gen_cv()
-    # config["ylabel"] = args.model
-
-    # exp.visualise(
-    #     model,
-    #     gen,
-    #     path=f"plot_{args.model}_{args.data}.pdf",
-    #     config=config,
-    # )
 
 import datetime
 from pathlib import Path
@@ -599,9 +589,6 @@ def run(model, seed=1, method="anp", problem="hartmann6", num_search_space_sampl
     initial_query_points = search_space.sample(num_initial_points)
     initial_data = observer(initial_query_points)
 
-    print(initial_data.observations.shape)
-    print(initial_data.query_points.shape)
-
     model = NeuralProcessTriesteWrapper(model, initial_data)
     num_query_points = 1
     acq_rule = trieste.acquisition.rule.DiscreteThompsonSampling(
@@ -634,9 +621,10 @@ def run(model, seed=1, method="anp", problem="hartmann6", num_search_space_sampl
 
 
 
-
 if __name__ == "__main__":
     model, method, dimx = get_model()
     print(method)
     print(dimx)
-    run(model, method=method, problem=f"hartmann{str(dimx)}")
+    for seed in range(5):
+        print("seed", seed)
+        run(model, seed=seed, method=method, problem=f"hartmann{str(dimx)}", num_steps=35 if dimx == 3 else 75)
