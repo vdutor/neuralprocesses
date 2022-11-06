@@ -441,6 +441,7 @@ import trieste
 
 from trieste.objectives.single_objectives import HARTMANN_3_MINIMIZER, HARTMANN_3_SEARCH_SPACE, hartmann_3
 from trieste.objectives.single_objectives import HARTMANN_6_MINIMIZER, HARTMANN_6_SEARCH_SPACE, hartmann_6
+from trieste.objectives.single_objectives import ACKLEY_5_MINIMIZER, ACKLEY_5_SEARCH_SPACE, ackley_5
 from trieste.objectives.utils import mk_observer
 from trieste.space import Box
 
@@ -466,20 +467,79 @@ def stats(problem):
         tf.math.reduce_variance(initial_data.observations),
     )
 
+import math
+
+import tensorflow as tf
+
+from trieste.space import Box
+from trieste.types import TensorType
+
+
+def rastrigin_4(x: TensorType) -> TensorType:
+    r"""
+    The 4-dimensional Rastrigin function is defined by:
+
+    ::math:
+        f(x) = A + \sum_{d=1}^4 (x_d^2 - A \cos(2 * \pi x_d)),
+
+    where :math:`A=10`.
+
+    This function has a global minimum at :math:`x=0` with :math:`f(x)=-30`.
+    
+    See Rastrigin, L. A. “Systems of extremal control.” Mir, Moscow (1974) for
+    more details.
+
+    Note that we rescale the original problem, which is typically defined
+    over `[-5.12, 5.12]^4`.
+
+    :param x: The points at which to evaluate the function, with shape [..., 4].
+    :return: The function values at ``x``, with shape [..., 1].
+    :raise ValueError (or InvalidArgumentError): If ``x`` has an invalid shape.
+    """
+    tf.debugging.assert_shapes([(x, (..., 4))])
+    x = (2.0 * x - 1.0) * 5.12  # rescale from [0, 1]^4 to [-5.12, 5.12]^4
+    A = 10.0
+    r = tf.reduce_sum(x ** 2 - A * tf.math.cos(2 * math.pi * x), axis=-1, keepdims=True)
+    y = A + r
+    return y
+
+
+RASTRIGIN_4_MINIMIZER = tf.ones((1, 4), tf.float64) * 0.5
+"""
+The global minimizer for the :func:`rastrigin_4` function, with shape [1, 4] and
+dtype float64.
+"""
+
+
+RASTRIGIN_4_MINIMUM = tf.constant([-30.], tf.float64)
+"""
+The global minimum for the :func:`rastrigin_4` function, with shape [1] and dtype
+float64.
+"""
+
+
+RASTRIGIN_4_SEARCH_SPACE = Box([0.0], [1.0]) ** 4
+""" The search space for the :func:`rastrigin_4` function. """
 
 OBJECTIVES = {
     "hartmann3": get_scaled_objective(hartmann_3, -0.93557, 0.901356),
     "hartmann6": get_scaled_objective(hartmann_6, -0.2588, 0.1455),
+    "ackley5": get_scaled_objective(ackley_5, 20.9778, 0.63444),
+    "rastrigin4": get_scaled_objective(rastrigin_4, 44.00, 410.87)
 }
 
 SEARCH_SPACES = {
     "hartmann3": Box([-1.] * 3, [1.0] * 3),
     "hartmann6": Box([-1.] * 6, [1.0] * 6),
+    "ackley5": Box([-1.] * 5, [1.0] * 5),
+    "rastrigin4": Box([-1.] * 4, [1.0] * 4),
 }
 
 MINIMA = {
     "hartmann3": OBJECTIVES["hartmann3"](2 * (HARTMANN_3_MINIMIZER - 0.5)),
     "hartmann6": OBJECTIVES["hartmann6"](2 * (HARTMANN_6_MINIMIZER - 0.5)),
+    "ackley5": OBJECTIVES["ackley5"](2 * (ACKLEY_5_MINIMIZER - 0.5)),
+    "rastrigin4": OBJECTIVES["rastrigin4"](2 * (RASTRIGIN_4_MINIMIZER - 0.5)),
 }
 
 from typing import Tuple
@@ -627,4 +687,5 @@ if __name__ == "__main__":
     print(dimx)
     for seed in range(5):
         print("seed", seed)
-        run(model, seed=seed, method=method, problem=f"hartmann{str(dimx)}", num_steps=35 if dimx == 3 else 75)
+        run(model, seed=seed, method=method, problem="rastrigin4", num_steps=50)
+        # run(model, seed=seed, method=method, problem=f"hartmann{str(dimx)}", num_steps=35 if dimx == 3 else 75)
