@@ -98,7 +98,7 @@ def n_best(df, col, col_err, *, ascending):
 
 def format_number(value, error, *, bold=False, possibly_negative=True):
     if np.isnan(value):
-        return ""
+        return "-"
     if np.abs(value) > 10 or np.abs(error) > 10:
         return "F"
     if value >= 0 and possibly_negative:

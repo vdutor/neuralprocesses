@@ -87,7 +87,7 @@ def setup(name, args, config, *, num_tasks_train, num_tasks_cv, num_tasks_eval, 
                 )[args.data],
             )
             for eval_name, x_range_context, x_range_target in [
-                ("interpolation in training range", (-1, 1), (-1, 1)),
+                ("interpolation in training range", (-2, 2), (-2, 2)),
                 # ("interpolation beyond training range", (2, 6), (2, 6)),
                 # ("extrapolation beyond training range", (-2, 2), (2, 6)),
             ]

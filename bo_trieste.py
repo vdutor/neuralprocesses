@@ -650,6 +650,27 @@ def run(model, seed=1, method="anp", problem="hartmann6", num_search_space_sampl
     initial_data = observer(initial_query_points)
 
     model = NeuralProcessTriesteWrapper(model, initial_data)
+
+    import time
+    import pandas as pd
+    data = []
+    for step in range(50):
+        num_context = num_initial_points + step
+        x_context = tf.random.normal((num_context, 3))
+        y_context = tf.random.normal((num_context, 1))
+        query = tf.random.normal((128, 3))
+        t0 = time.time()
+        print("update")
+        model.update(Dataset(x_context, y_context))
+        model.sample(query, num_samples=1000)
+        t1 = time.time()
+        data.append({"num_context": num_context, "time": t1-t0})
+
+    df = pd.DataFrame(data)
+    df.to_csv(f"data_{method}.csv")
+    exit(0)
+
+
     num_query_points = 1
     acq_rule = trieste.acquisition.rule.DiscreteThompsonSampling(
         num_search_space_samples=num_search_space_samples,
@@ -685,7 +706,7 @@ if __name__ == "__main__":
     model, method, dimx = get_model()
     print(method)
     print(dimx)
-    for seed in range(5):
+    for seed in range(1):
         print("seed", seed)
-        run(model, seed=seed, method=method, problem="rastrigin4", num_steps=50)
+        run(model, seed=seed, method=method, problem="hartmann3", num_steps=50)
         # run(model, seed=seed, method=method, problem=f"hartmann{str(dimx)}", num_steps=35 if dimx == 3 else 75)

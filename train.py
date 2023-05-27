@@ -23,6 +23,10 @@ def train(state, model, opt, objective, gen, *, fix_noise):
     """Train for an epoch."""
     vals = []
     for batch in gen.epoch():
+        # xt, yt = batch["xt"], batch["yt"]
+        # context = batch["contexts"][0]
+        # xc, yc = context[0], context[1]
+        # print(xc.shape, yc.shape, xt.shape, yt.shape)
         state, obj = objective(
             state,
             model,
@@ -262,8 +266,8 @@ def main(**kw_args):
         args,
         config,
         num_tasks_train=2**6 if args.train_fast else 2**14,
-        num_tasks_cv=2**6 if args.evaluate_fast else 2**12,
-        num_tasks_eval=2**6 if args.evaluate_fast else 2**12,
+        num_tasks_cv=2**7 if args.evaluate_fast else 2**12,
+        num_tasks_eval=2**7 if args.evaluate_fast else 2**12,
         device=device,
     )
 
@@ -414,7 +418,7 @@ def main(**kw_args):
                 config["unet_channels"] = tuple(
                     int(c / 2**0.5) for c in config["unet_channels"]
                 )
-                config["dws_channels"] = int(config["dws_channels"] / 2**0.5)
+                # config["dws_channels"] = int(config["dws_channels"] / 2**0.5)
             model = nps.construct_convgnp(
                 points_per_unit=config["points_per_unit"],
                 dim_x=config["dim_x"],
@@ -626,6 +630,25 @@ def main(**kw_args):
         original_epsilon = B.epsilon
         B.epsilon = config["epsilon_start"]
 
+        print("===============")
+        for i, batch in enumerate(gen_train.epoch()):
+            xt, yt = batch["xt"], batch["yt"]
+            context = batch["contexts"][0]
+            xc, yc = context[0], context[1]
+            print(i, xc.shape, yc.shape, xt.shape, yt.shape)
+            if i > 5: break
+
+        # for gen_name, gen in gens_eval():
+        #     print(gen_name)
+        #     for i, batch in enumerate(gen.epoch()):
+        #         xt, yt = batch["xt"], batch["yt"]
+        #         context = batch["contexts"][0]
+        #         xc, yc = context[0], context[1]
+        #         print(i, xc.shape, yc.shape, xt.shape, yt.shape)
+        #         if i > 5: break
+        
+        # exit(0)
+        
         for i in range(start, args.epochs):
             with out.Section(f"Epoch {i + 1}"):
                 # Set regularisation to normal after the first epoch.
