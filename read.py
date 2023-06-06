@@ -116,34 +116,36 @@ target_file = 'log_train.txt'  # Replace with the specific filename
 data_np = get_np_data(root_directory, target_file)
 
 
-# Data from 'regression-May25-2'
+# Models from 'regression-May25-2'
+# See regression-May29-eval for the evaluation results
 # num_layers = 4
 # num_hidden = 64
+# float64 = False
 data_ndp = [
     # EQ
-    {"model": "ndp", "data": "eq", "dim_x": 1, "loglik_mean": 0.3922, "loglik_error": 0.052},
-    {"model": "ndp", "data": "eq", "dim_x": 2, "loglik_mean": -0.6895, "loglik_error": 0.070},
-    {"model": "ndp", "data": "eq", "dim_x": 3, "loglik_mean": -1.1367, "loglik_error": 0.061},
+    {"model": "ndp", "data": "eq", "dim_x": 1, "loglik_mean": 0.47832477, "loglik_error": 0.03662583},
+    {"model": "ndp", "data": "eq", "dim_x": 2, "loglik_mean": -0.67219281, "loglik_error": 0.04626374},
+    {"model": "ndp", "data": "eq", "dim_x": 3, "loglik_mean": -1.15707684, "loglik_error": 0.03844018},
     # Matern: TODO
-    {"model": "ndp", "data": "matern", "dim_x": 1, "loglik_mean": -0.0228, "loglik_error": 0.059},
-    {"model": "ndp", "data": "matern", "dim_x": 2, "loglik_mean": -1.0311, "loglik_error": 0.065},
-    {"model": "ndp", "data": "matern", "dim_x": 3, "loglik_mean": -1.3292, "loglik_error": 0.061},
+    {"model": "ndp", "data": "matern", "dim_x": 1, "loglik_mean": -0.00083868, "loglik_error": 0.04221253},
+    {"model": "ndp", "data": "matern", "dim_x": 2, "loglik_mean": -1.05238593, "loglik_error": 0.03250215},
+    {"model": "ndp", "data": "matern", "dim_x": 3, "loglik_mean": -1.32986808, "loglik_error": 0.03265943},
 ]
 
 
 data_gp = [
-    {'model': 'gp', 'data': 'eq', 'dim_x': 1, 'loglik_mean': 0.6679539532715968, 'loglik_error': 0.16069011550885726},
-    {'model': 'gp', 'data': 'eq', 'dim_x': 2, 'loglik_mean': -0.4455377081957977, 'loglik_error': 0.19261538496950073},
-    {'model': 'gp', 'data': 'eq', 'dim_x': 3, 'loglik_mean': -0.9361569976140109, 'loglik_error': 0.1578126994755338},
-    {'model': 'gp', 'data': 'matern', 'dim_x': 1, 'loglik_mean': 0.18864097804478083, 'loglik_error': 0.19109718556668873},
-    {'model': 'gp', 'data': 'matern', 'dim_x': 2, 'loglik_mean': -0.8498409649606519, 'loglik_error': 0.15224475226042086},
-    {'model': 'gp', 'data': 'matern', 'dim_x': 3, 'loglik_mean': -1.1387292239297337, 'loglik_error': 0.11839216131426777},
-    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 1, 'loglik_mean': -0.8793676809905253, 'loglik_error': 0.41520879243126835},
-    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 2, 'loglik_mean': -1.0362116659485212, 'loglik_error': 0.2494292430604046},
-    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 3, 'loglik_mean': -1.218478761110416, 'loglik_error': 0.20358069923057906},
-    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 1, 'loglik_mean': -0.9786567394013844, 'loglik_error': 0.3396797884269058},
-    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 2, 'loglik_mean': -1.2148931971423935, 'loglik_error': 0.22800835764920332},
-    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 3, 'loglik_mean': -1.3125737233647539, 'loglik_error': 0.15812294293546533},
+    {'model': 'gp', 'data': 'eq', 'dim_x': 1, 'loglik_mean': 0.667953953271597, 'loglik_error': 0.0284062675864906},
+    {'model': 'gp', 'data': 'eq', 'dim_x': 2, 'loglik_mean': -0.4455377081957982, 'loglik_error': 0.03404991121819787},
+    {'model': 'gp', 'data': 'eq', 'dim_x': 3, 'loglik_mean': -0.9361569976140109, 'loglik_error': 0.027897607489126185},
+    {'model': 'gp', 'data': 'matern', 'dim_x': 1, 'loglik_mean': 0.18864097804478128, 'loglik_error': 0.033781528944967554},
+    {'model': 'gp', 'data': 'matern', 'dim_x': 2, 'loglik_mean': -0.8498409649606518, 'loglik_error': 0.026913324180852388},
+    {'model': 'gp', 'data': 'matern', 'dim_x': 3, 'loglik_mean': -1.1387292239297335, 'loglik_error': 0.020928975026162592},
+    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 1, 'loglik_mean': -0.8793676809905253, 'loglik_error': 0.07339923818410686},
+    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 2, 'loglik_mean': -1.0362116659485214, 'loglik_error': 0.04409327729855993},
+    {'model': 'gp_diag', 'data': 'eq', 'dim_x': 3, 'loglik_mean': -1.2184787611104158, 'loglik_error': 0.03598832323616035},
+    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 1, 'loglik_mean': -0.9786567394013844, 'loglik_error': 0.06004747045716921},
+    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 2, 'loglik_mean': -1.2148931971423933, 'loglik_error': 0.040306563965239815},
+    {'model': 'gp_diag', 'data': 'matern', 'dim_x': 3, 'loglik_mean': -1.3125737233647539, 'loglik_error': 0.02795245130271025},
 ]
 
 
@@ -194,9 +196,9 @@ df2 = df.groupby(["model", "data", "dim_x"]).agg({ m: ["first"] for m in metrics
 df2 = df2.unstack([1,2])  # makes data and dim_x into columns
 df2 = df2.droplevel(1, axis=1)  # removes the "first" level
 # sort by rank
-# rank = df2["loglik_mean"].rank().mean(axis=1, skipna=True)
-# df2["rank"] = rank
-# df2 = df2.sort_values("rank", ascending=False)
+rank = df2["loglik_mean"].rank().mean(axis=1, skipna=True)
+df2["rank"] = rank
+df2 = df2.sort_values("rank", ascending=False)
 
 
 for col in df2["loglik_mean"].columns:
@@ -211,18 +213,20 @@ for col in df2["loglik_mean"].columns:
 def format_row(row):
     for col in df2["loglik_mean"].columns:
         v = row[("loglik_mean", *col)]
-        e = row[("loglik_mean", *col)]
+        e = row[("loglik_error", *col)]
         row[("table", *col)] = format_number(v, e, bold=row[("best", *col)], possibly_negative=True)
 
     return row
     
 
 RENAME = {
-    "gp": "GP",
-    "gp_diag": "GP (diag)",
+    "gp": "GP {(truth)}",
+    "gp_diag": "GP {(diag)}",
     "ndp": "NDP",
     "eq": "Squared Exponential",
-    "matern": "Matérn 5/2",
+    "matern": r"Matérn-$\frac52$",
+    "convcnp": "ConvCNP",
+    "convnp": "ConvNP",
 }
 
 def display_name(name):
@@ -231,8 +235,10 @@ def display_name(name):
 df_table = df2.apply(format_row, axis=1)["table"]
 df_table.index = [f"\\scshape {display_name(x)}" for x in df_table.index]
 df_table.columns = pd.MultiIndex.from_tuples(
-    [(display_name(dataset), f"${dim}$") for dataset, dim in df_table.columns]
+    [(display_name(dataset), f"$D = {dim}$") for dataset, dim in df_table.columns]
 )
-print(df_table.style.to_latex())
+print(
+    df_table.style.to_latex(column_format="l" + "c" * 6, hrules=True, multicol_align="c")
+)
     
 
